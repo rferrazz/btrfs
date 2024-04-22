@@ -48,11 +48,8 @@ func CreateSubVolume(path string) error {
 	if inherit != nil {
 		panic("not implemented") // TODO
 		args := btrfs_ioctl_vol_args_v2{
-			flags: subvolQGroupInherit,
-			btrfs_ioctl_vol_args_v2_u1: btrfs_ioctl_vol_args_v2_u1{
-				//size: 	qgroup_inherit_size(inherit),
-				qgroup_inherit: inherit,
-			},
+			flags:                      subvolQGroupInherit,
+			btrfs_ioctl_vol_args_v2_u1: NewQGroupArgs(0, inherit), //size: 	qgroup_inherit_size(inherit)
 		}
 		copy(args.name[:], newName)
 		return iocSubvolCreateV2(dst, &args)

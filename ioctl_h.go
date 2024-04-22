@@ -3,11 +3,12 @@ package btrfs
 import (
 	"encoding/binary"
 	"encoding/hex"
-	"github.com/dennwc/ioctl"
 	"os"
 	"strconv"
 	"strings"
 	"unsafe"
+
+	"github.com/dennwc/ioctl"
 )
 
 var order = binary.LittleEndian
@@ -89,7 +90,20 @@ type btrfs_ioctl_qgroup_limit_args struct {
 
 type btrfs_ioctl_vol_args_v2_u1 struct {
 	size           uint64
-	qgroup_inherit *btrfs_qgroup_inherit
+	qgroup_inherit uint64
+}
+
+func NewQGroupArgs(size uint64, inherit *btrfs_qgroup_inherit) btrfs_ioctl_vol_args_v2_u1 {
+	result := btrfs_ioctl_vol_args_v2_u1{
+		size: size,
+	}
+	ptr := uintptr(unsafe.Pointer(inherit))
+	result.qgroup_inherit = uint64(ptr)
+	return result
+}
+
+func (c btrfs_ioctl_vol_args_v2_u1) QGroupInherit() *btrfs_qgroup_inherit {
+	return (*btrfs_qgroup_inherit)(unsafe.Pointer(&c.qgroup_inherit))
 }
 
 const subvolNameMax = 4039
